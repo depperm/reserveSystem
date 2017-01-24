@@ -54,6 +54,15 @@ Read a json loaded with a system and its components and children. Format of json
 
 ## Installation
 TODO: Describe the installation process
+
+Install [python](https://www.python.org/)
+
+Required python modules:
+
+* [Flask](http://flask.pocoo.org/) - `pip install Flask`
+* [YAML](http://pyyaml.org/wiki/PyYAML) - `pip install pyyaml`
+* [simplejson](https://simplejson.readthedocs.io/en/latest/) - `pip install simplejson`
+
 ## Usage
 TODO: Write usage instructions
 ## Contributing
