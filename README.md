@@ -1,5 +1,57 @@
-# ${1Reserve Syste
-TODO: Write a project description
+# Reserve System
+Read a json loaded with a system and its components and children. Format of json:
+
+```
+{
+  "name":"Testbeds",
+  "children":[
+    {
+      "name":"A Testbed",
+      "type":"testbed",
+      "reserved_by":"User",
+      "reserved_at":"YYYY-MM-DD HH:MM:SS",
+      "reserved_for":"30",
+      "children":[
+        {
+            "name":"Beam 1",
+            "type":"beam",
+            "children":[
+                {
+                    "name":"Component",
+                    "children":[
+                        {
+                            "name":"Feature A",
+                            "children":[
+                                {
+                                    "name":"Child FA"
+                                }
+                            ]
+                        },
+                        {
+                            "name":"Feature B"
+                        },
+                        {
+                            "name":"Feature C",
+                            "children":[
+                                {
+                                    "name":"Child CA"
+                                }
+                            ]
+                        }
+                      ]
+                  }
+                ]
+            }
+          ]
+      },
+      {
+        "name":"Beam 2",
+        "type":"beam"
+      }
+    ]
+}
+```
+
 ## Installation
 TODO: Describe the installation process
 ## Usage
