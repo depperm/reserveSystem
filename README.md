@@ -69,6 +69,7 @@ TODO: Write usage instructions
 Uses:
 * [Bootstrap](http://getbootstrap.com/)
 * [jQuery](https://jquery.com/)
+* [jstree](https://www.jstree.com)
 
 ## Contributing
 1. Fork it!
