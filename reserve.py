@@ -1,11 +1,11 @@
 from __future__ import print_function
-from flask import Flask
-from flask import render_template
+from flask import Flask,render_template, request, url_for, redirect
 import sys, os,yaml
 import simplejson as json
 
 TESTBEDS=[]
 TESTBED_JSON=[]
+SELECTED_VIEW='testbed_1'
 
 def jsonParse(file_name):
     global TESTBEDS,TESTBED_JSON
@@ -23,9 +23,16 @@ def jsonParse(file_name):
 app = Flask(__name__)
 
 @app.route("/")
-def hello():
-    return render_template('example.html',testbeds=TESTBEDS)
+def main():
+    return render_template('example.html',testbeds=TESTBEDS,current_testbed=SELECTED_VIEW)
     #return "Hello World!"
+
+@app.route('/change', methods=['POST'])
+def change_testbed():
+    global SELECTED_VIEW
+    SELECTED_VIEW = request.form.get('testbed_select')
+    print('hahahaha'+SELECTED_VIEW, file=sys.stderr)
+    return url_for('main')
 
 @app.route('/reserve/<testbed>')
 def show_user_profile(username):

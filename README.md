@@ -57,14 +57,11 @@ TODO: Describe the installation process
 
 Install [python](https://www.python.org/)
 
-Install [mongodb](https://www.mongodb.com/download-center#community)
-
 Required python modules:
 
 * [Flask](http://flask.pocoo.org/) - `pip install Flask`
 * [YAML](http://pyyaml.org/wiki/PyYAML) - `pip install pyyaml`
 * [simplejson](https://simplejson.readthedocs.io/en/latest/) - `pip install simplejson`
-* [pymongo](https://pypi.python.org/pypi/pymongo) - `pip install pymongo`
 
 ## Usage
 TODO: Write usage instructions
