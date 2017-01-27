@@ -5,7 +5,7 @@ import simplejson as json
 
 TESTBEDS=[]
 TESTBED_JSON=[]
-SELECTED_VIEW='testbed_1'
+SELECTED_VIEW=''
 
 def jsonParse(file_name):
     global TESTBEDS,TESTBED_JSON
@@ -16,23 +16,28 @@ def jsonParse(file_name):
     print(json.dumps(data), file=sys.stderr)
     print(data.keys(), file=sys.stderr)
     for testbed in data['children']:
-        TESTBEDS.append(testbed['name'])
-        TESTBED_JSON.append(testbed['children'])
+        TESTBEDS.append(testbed['text'])
+        TESTBED_JSON.append(testbed)
 
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/", methods=['GET','POST'])
 def main():
-    return render_template('example.html',testbeds=TESTBEDS,current_testbed=SELECTED_VIEW)
-    #return "Hello World!"
-
-@app.route('/change', methods=['POST'])
-def change_testbed():
     global SELECTED_VIEW
-    SELECTED_VIEW = request.form.get('testbed_select')
-    print('hahahaha'+SELECTED_VIEW, file=sys.stderr)
-    return url_for('main')
+    if request.method == 'POST':
+        SELECTED_VIEW = request.form.get('testbed_select')
+    if SELECTED_VIEW == '':
+        SELECTED_VIEW = TESTBEDS[0]
+    t = None
+    for test in TESTBED_JSON:
+        if test['text'] == SELECTED_VIEW:
+            t=test
+    if t == None:
+        t = {'text':'Failed to Load JSON'}
+    print(t, file=sys.stderr)
+
+    return render_template('example.html',testbeds=TESTBEDS,current_testbed=SELECTED_VIEW,testbed_data=json.dumps(t['children']))
 
 @app.route('/reserve/<testbed>')
 def show_user_profile(username):
