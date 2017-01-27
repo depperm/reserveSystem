@@ -6,35 +6,35 @@ Read a json loaded with a system and its components and children. Format of json
   "name":"Testbeds",
   "children":[
     {
-      "name":"A Testbed",
+      "text":"A Testbed",
       "type":"testbed",
       "reserved_by":"User",
       "reserved_at":"YYYY-MM-DD HH:MM:SS",
       "reserved_for":"30",
       "children":[
         {
-            "name":"Beam 1",
+            "text":"Beam 1",
             "type":"beam",
             "children":[
                 {
-                    "name":"Component",
+                    "text":"Component",
                     "children":[
                         {
-                            "name":"Feature A",
+                            "text":"Feature A",
                             "children":[
                                 {
-                                    "name":"Child FA"
+                                    "text":"Child FA"
                                 }
                             ]
                         },
                         {
-                            "name":"Feature B"
+                            "text":"Feature B"
                         },
                         {
-                            "name":"Feature C",
+                            "text":"Feature C",
                             "children":[
                                 {
-                                    "name":"Child CA"
+                                    "text":"Child CA"
                                 }
                             ]
                         }
@@ -45,7 +45,7 @@ Read a json loaded with a system and its components and children. Format of json
           ]
       },
       {
-        "name":"Beam 2",
+        "text":"Beam 2",
         "type":"beam"
       }
     ]
