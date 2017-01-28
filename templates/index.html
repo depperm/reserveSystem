@@ -4,6 +4,7 @@
   var testbedJSON=JSON.parse('{{testbed_data|safe}}');
   //console.log(JSON.stringify(testbedJSON));
   $(function() {
+    //reserving a component
     $('#reserve_component_btn').on('click',function(){
       $.getJSON($SCRIPT_ROOT+'/_reserve_component',{
         user:$('#usrnm').val(),
@@ -14,8 +15,31 @@
       },function(data){
         console.log('sent and updated');
         console.log(JSON.stringify(data.result));
+        testbedJSON = data.result;
+        $('#jstree').jstree(true).settings.core.data = data.result;
+        $('#jstree').jstree(true).refresh();
+        $('.modal').toggle();
+        function findDetails(json){
+          $.each( json, function( key, value ) {
+            //console.log( key + ": " + JSON.stringify(value) );
+            if(value['text']==$('#compToReserve').text()){
+              $('#reserved_by').val(value['reserved_by']);
+              $('#reserved_at').val(value['reserved_at']);
+              $('#reserved_for').val(value['reserved_for']);
+              return;
+            }
+            if('children' in value && value['children']){
+              findDetails(value['children']);
+            }
+          });
+        }
+        findDetails(testbedJSON);
+        $('#reserved_template').show();
+        $('#unreserved_template').hide();
       });
+      return false;
     });
+    //jstree initialization
     $('#jstree').jstree({ 
       'core' : {
         'data' : testbedJSON
@@ -27,6 +51,7 @@
       },
       'plugins':['core','types']
     });
+    //disable reserve button if form is incomplete
     $('form .modal-input input:not([type=checkbox])').on('keyup',function(){
       var empty =false;
       $('form .modal-input input:not([type=checkbox])').each(function(){
@@ -40,6 +65,7 @@
         $('#reserve_component_btn').prop('disabled',false);
       }
     });
+    //clicking on jstree
     $(document).on('click','.jstree-anchor',function(){
       var componentName=$(this).text();
       if($(this).hasClass('jstree-disabled')){

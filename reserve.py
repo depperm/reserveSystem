@@ -76,6 +76,7 @@ def reserve_component():
                     child['reserved_by']=user
                     child['reserved_at']=time
                     child['reserved_for']=duration
+                    child['state']['disabled']=True
                     print('updating?', file=sys.stderr)
                 if found:
                     break
@@ -87,6 +88,7 @@ def reserve_component():
         if test['text'] == SELECTED_VIEW:
             t=test
     updateJSON(t['children'])
+    # TODO: update JSON here/save to file
     print(yaml.safe_load(json.dumps(t)), file=sys.stderr)
 
     return jsonify(result=yaml.safe_load(json.dumps(t['children'])))
