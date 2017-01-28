@@ -6,6 +6,7 @@ import simplejson as json
 TESTBEDS=[]
 TESTBED_JSON=[]
 SELECTED_VIEW=''
+found=False
 
 def jsonParse(file_name):
     global TESTBEDS,TESTBED_JSON
@@ -54,15 +55,41 @@ def main():
 
 @app.route('/_reserve_component')
 def reserve_component():
+    print('reserving', file=sys.stderr)
+    component = request.args.get('component')
     user = request.args.get('user')
     time = request.args.get('time')
     duration = request.args.get('duration')
-    email =request.args.get('email')
+    email = request.args.get('email')
     print(user, file=sys.stderr)
     print(time, file=sys.stderr)
     print(duration, file=sys.stderr)
     print(email, file=sys.stderr)
-    return 'done'
+
+    def updateJSON(json):
+        global found
+        if not found:
+            for child in json:
+                print((child['text']+' '+component), file=sys.stderr)
+                if child['text'] == component:
+                    found=True
+                    child['reserved_by']=user
+                    child['reserved_at']=time
+                    child['reserved_for']=duration
+                    print('updating?', file=sys.stderr)
+                if found:
+                    break
+                if 'children' in child and not found:
+                    updateJSON(child['children'])
+
+    t = None
+    for test in TESTBED_JSON:
+        if test['text'] == SELECTED_VIEW:
+            t=test
+    updateJSON(t['children'])
+    print(yaml.safe_load(json.dumps(t)), file=sys.stderr)
+
+    return jsonify(result=yaml.safe_load(json.dumps(t['children'])))
 
 if __name__ == "__main__":
     jsonParse('sampleReservedJson.json')
