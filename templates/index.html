@@ -1,0 +1,165 @@
+{% extends "layout.html" %}
+{% block body %}
+<script type="text/javascript">
+  var testbedJSON=JSON.parse('{{testbed_data|safe}}');
+  //console.log(JSON.stringify(testbedJSON));
+  $(function() {
+    $('#reserve_component_btn').on('click',function(){
+      $.getJSON($SCRIPT_ROOT+'/_reserve_component',{
+        user:$('#usrnm').val(),
+        time:$('#reserveAt').val(),
+        duration:$('#reserveFor').val(),
+        email:$('#email').is(':checked')
+      },function(data){
+        console.log('sent and updated');
+      });
+    });
+    $('#jstree').jstree({ 
+      'core' : {
+        'data' : testbedJSON
+      },
+      'types':{
+        'ipgw': {
+          'icon':"{{url_for('static',filename='icons/IPGW.png')}}"
+        }
+      },
+      'plugins':['core','types']
+    });
+    $('form .modal-input input:not([type=checkbox])').on('keyup',function(){
+      var empty =false;
+      $('form .modal-input input:not([type=checkbox])').each(function(){
+        if($(this).val() == ''){
+          empty=true;
+        }
+      });
+      console.log('>>'+$('#modal-form').valid());
+      if(empty || !$('#modal-form').valid()){ 
+        $('#reserve_component_btn').prop('disabled', true);
+      } else {
+        $('#reserve_component_btn').prop('disabled',false);
+      }
+    });
+    $(document).on('click','.jstree-anchor',function(){
+      var componentName=$(this).text();
+      if($(this).hasClass('jstree-disabled')){
+        $('a').removeClass('jstree-clicked');
+        $(this).addClass('jstree-clicked');
+        $('#reserved_template').show();
+        $('#unreserved_template').hide();
+        //show data
+        function findDetails(json){
+          $.each( json, function( key, value ) {
+            //console.log( key + ": " + JSON.stringify(value) );
+            if(value['text']==componentName){
+              $('#reserved_by').val(value['reserved_by']);
+              $('#reserved_at').val(value['reserved_at']);
+              $('#reserved_for').val(value['reserved_for']);
+              return;
+            }
+            if('children' in value && value['children']){
+              findDetails(value['children']);
+            }
+          });
+        }
+        findDetails(testbedJSON);
+      }else{
+        $('#unreserved_template').show();
+        $('#reserved_template').hide();
+      }
+      $('#component_name').text(componentName+':');
+    });
+    $('#reserve_component').on('click',function(){
+      $('.modal').toggle();
+    });
+    $('.close').on('click',function(){
+      $('.modal').toggle();
+    });
+    $('.modal').on('click',function(e){
+      if(e.target.id == 'myModal')
+        $('.modal').toggle();
+    });
+  });
+</script>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <form action="{{ url_for('main') }}" method=post class=change-testbed>
+                <select name='testbed_select'>
+                {% for testbed in testbeds %}
+                  {% if testbed == current_testbed %}
+                    <option name='testbed_{{loop.index}}' selected>{{ testbed }}</option>
+                  {% else %}
+                    <option name='testbed_{{loop.index}}'>{{ testbed }}</option>
+                  {% endif %}
+                {% endfor %}
+                </select>
+                <input type='submit' value='Load' />
+            </form>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right">
+            <input type="text" class="form-control" title="5 second auto refresh" placeholder="Refresh">
+          </form>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div id='jstree' class="col-sm-3 col-md-2 sidebar">
+        </div>
+        <div class="col-sm-9 col-md-10 main col-sm-offset-3 col-md-offset-2">
+           <fieldset>
+            <legend><span id='component_name'></span></legend>
+              <div id='reserved_template' style="display: none;">
+                <table>
+                  <tr>
+                    <td class='table_row'>Reserved by:</td>
+                    <td class='table_row'><input type="text" readonly id='reserved_by'></td>
+                  </tr>
+                  <tr>
+                    <td class='table_row'>Reserved at:</td>
+                    <td class='table_row'><input type="text" readonly id='reserved_at'></td>
+                  </tr>
+                  <tr>
+                    <td class='table_row'>Reserved for:</td>
+                    <td class='table_row'><input type="number" id='reserved_for' title='in minutes' readonly></td>
+                  </tr>
+                </table>
+              </div>
+              <div id='unreserved_template' style="display: none;">
+                Un-reserved <button class='btn btn-primary' id='reserve_component'>Reserve</button>
+                <div id='myModal' class='modal'>
+                  <div class="modal-content" id='myModalContent'>
+                    <span class="close">&times;</span>
+                    <form id='modal-form' method="post">
+                      <div class='form-info'>
+                        <h3>Reserve information</h3>
+                        <div class='modal-input'>
+                          <label for="usrnm" class="ui-hidden-accessible">Username:</label>
+                          <input type="text" name="user" id="usrnm" placeholder="Username">
+                        </div>
+                        <div class='modal-input'>
+                          <label for="reserveAt" class="ui-hidden-accessible">Reserve at:</label>
+                          <input type="text" name='time' id="reserveAt" pattern='(((0[0-9]|[0-9]|1[0-2]):([0-5][0-9])\s*(am|AM|pm|PM))|(0[0-9]|[0-9]|1[0-9]|2[0-4]):([0-5][0-9])\s*)'>
+                        </div>
+                        <div class='modal-input'>
+                          <label for="reserveFor">Reserved for:</label>
+                          <input type="number" min=5 max=1440 name='duration' id="reserveFor" title='must be between 5 and 1440' value=15>
+                        </div>
+                        <div class='modal-input'>
+                          <label for='email'>Send email</label>
+                          <input type='checkbox' name='email' id='email'>
+                        </div>
+                        <button class='btn btn-primary' id='reserve_component_btn'>Reserve</button>
+                        <!--<input type="submit" data-inline="true" value="Reserve" id='reserve_component_btn' disabled>-->
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              </div>
+           </fieldset>
+        </div>
+    </div>
+</div>
+{% endblock %}
